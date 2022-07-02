@@ -1,0 +1,108 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  submitter
+
+  Sample SAM Template for submitter
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 3
+
+Parameters:
+  stage:
+    Description: The  stage in which to deploy resources
+    Type: String
+    Default: dev
+    AllowedValues:
+      - dev
+      - test
+      - prod
+
+Resources:
+
+
+  ######## Submission API and Functions ########
+  SubmissionApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: !Ref stage
+      Cors: "'*'"
+
+  GetSubmissionFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: SubmissionPublicFunctions/GetSubmission/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Environment:
+        Variables:
+          SUBMISSION_TABLE: !Ref SubmissionTable
+          BUCKET_NAME: !Ref SubmissionBucket
+      Architectures:
+        - x86_64
+      FunctionName: !Sub getSubmission-${stage}
+      Events:
+        GetSubmission:
+          Type: Api
+          Properties: 
+            RestApiId: !Ref SubmissionApi
+            Path: /getSubmission
+            Method: GET
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref SubmissionTable
+  
+
+  ## TODO: Execute Submission function
+  ## TODO: Possible Function Handle Submission upload
+
+  ## TODO: Function Triggered by S3 Upload
+  DeploySubmissionFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: SubmissionPublicFunctions/DeploySubmissionFunction/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      FunctionName: !Sub DeploySubmission-${stage}
+      Policies:
+        - S3ReadPolicy:
+            BucketName: '*'
+      Events:
+        S3Event:
+          Type: S3
+          Properties:
+            Bucket: !Ref SubmissionBucket
+            Events: s3:ObjectCreated:*
+
+  SubmissionTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: submissionId
+        Type: String
+      TableName: !Sub submissionTable-${stage}
+
+  ## TODO: Declare an s3 bucket
+  SubmissionBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub submitter-submissions-bucket-${stage}
+
+  #### Event Functions ######
+
+  ## TODO: Event API With Cognito Auth
+
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  SubmissionApiUrl:
+    Description: Target URL of the Submission API
+    Value: !Sub "https://${SubmissionApi}.execute-api.${AWS::Region}.amazonaws.com/{stage}/"
+    Export:
+      Name: SubmissionApiUrl

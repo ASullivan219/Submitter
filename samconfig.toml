@@ -1,0 +1,13 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "submitter"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-19joznybnfkno"
+s3_prefix = "submitter"
+region = "us-east-2"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "stage=\"dev\""
+image_repositories = []
+disable_rollback = true

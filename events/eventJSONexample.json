@@ -1,0 +1,35 @@
+{
+    "eventId": "XXX-XXX-XXX",
+    "title": "Example Title",
+    "participants":[
+        {
+            "email":"alexander.sullivan219@gmail.com",
+            "submissionId":"XXX-XXX-XXX-XXX"
+        },
+        {
+            "email":"a.sullivan219@gmail.com",
+            "submissionId":"XXX-XXX-XXX-XXX"
+        }
+    ],
+    "inputs": {
+        "testInputs":[
+            {
+                "stdin":"",
+                "expectedStdout":"",
+                "runtime":""
+            }
+        ],
+        "gradeinputs":[
+            {
+                "stdin":"",
+                "expectedStdout":"",
+                "runtime":""
+            },
+            {
+                "input":"",
+                "expectedStdout":"",
+                "runtime":""
+            }
+        ]
+    }
+}
