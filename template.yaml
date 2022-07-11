@@ -53,6 +53,8 @@ Resources:
       Policies:
         - DynamoDBReadPolicy:
             TableName: !Ref SubmissionTable
+        - S3WritePolicy:
+            BucketName: !Ref SubmissionBucket
   
 
   ## TODO: Execute Submission function

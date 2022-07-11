@@ -1,0 +1,18 @@
+{
+    "submissionId":"",
+    "email":"",
+    "uploaded": "True",
+    "event-Name":"Example Assignment 1",
+    "executionResults":{
+        "testCases":{
+            "stdin":[],
+            "stdout":[],
+            "stderr":[]
+        },
+        "gradeCases":{
+            "stdin":[],
+            "stdout":[],
+            "stderr":[]
+        }
+    }
+}
