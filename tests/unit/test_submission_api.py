@@ -21,6 +21,8 @@ def valid_api_event():
     os.environ.setdefault('DEBUG', 'true')
 
     ## Generate a UUID and insert into database as a submission
+    ## In the future we can have the event API functions create submissions
+    ## Rather than placing an arbitrary value within the Submission table
     uniqueId = str(uuid.uuid4())
     try:
         DYNAMO_CLIENT.put_item(
@@ -34,17 +36,31 @@ def valid_api_event():
     except Exception as e:
         print(e)
         
-    return {
+    yield {
         "queryStringParameters":{
             "submissionId": uniqueId
         }
     }
+
+    ## Cleanup the UUID Placed within the function
+    try:
+        response = DYNAMO_CLIENT.delete_item(
+            TableName = os.environ.get('SUBMISSION_TABLE'),
+            Key = {
+                'submissionId':{
+                    'S': uniqueId
+                }
+            }
+        )
+        print(f"[DELETE RESPONSE] {response}")
+    except Exception as e:
+        print(e)
 
 def test_success_code(valid_api_event):
     print(os.environ.get('SUBMISSION_TABLE'))
 
     ret = app.lambda_handler(valid_api_event, "")
     assert ret.get('statusCode') == 200
-    assert os.environ.get('SUBMISSION_TABLE') == 'submissionTable-dev'
-    assert os.environ.get('BUCKET_NAME') == 'submitter-submissions-bucket-dev'
-    assert os.environ.get('DEBUG') == 'true'
+    body = json.loads(ret.get('body'))
+    print(body)
+    assert body.get('postInfo') is not None
